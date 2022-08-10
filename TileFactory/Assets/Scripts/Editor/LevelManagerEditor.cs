@@ -16,6 +16,16 @@ namespace UnityEditor
             {
                 script.SaveMap();
             }
+            
+            if (GUILayout.Button("Clear Tilemaps"))
+            {
+                script.ClearMap();
+            }
+            
+            if (GUILayout.Button("Load Level"))
+            {
+                script.LoadMap();
+            }
         }
     }
 }

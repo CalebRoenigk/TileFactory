@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Factory;
+using Factory.Objects;
 
 public class LevelManager : Monobehavior
 {
@@ -116,16 +118,55 @@ public class LevelManager : Monobehavior
         
         // Save the level
         ScriptableObjectUtility.SaveLevelFile(newLevel);
-}
+    }
 
+    // Clear all tilemaps
     public void ClearMap()
     {
-        
+        Tilemap[] tilemaps = FindObjectsOfType<Tilemap>();
+
+        foreach (Tilemap tilemap in tilemaps)
+        {
+            tilemap.ClearAllTiles();
+        }
     }
 
     public void LoadMap()
     {
-        
+        LevelData level = Resources.Load<LevelData>($"Levels/Level {levelIndex}");
+        if (level == null)
+        {
+            Debug.LogError($"Level {levelIndex} does not exist.");
+            return;
+        }
+
+        ClearMap();
+
+        // TODO: Make tiles be placed. Need to determine how to do resource dict for tiles to match their entities
+        for (int x = 0; x < level.grid.size.x; x++)
+        {
+            for (int y = 0; y < level.grid.size.y; y++)
+            {
+                Entity entityForeground = foreground[x, y];
+                Entity entityBackground = background[x, y];
+
+                switch (entityForeground.GetType())
+                {
+                    case "Terrain - Sides":
+                        break;
+                    case "Terrain - Top":
+                        break;
+                    case "Terrain - Solo Top":
+                        break;
+                    case "Water":
+                        break;
+                    case "Support - Background":
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 }
 
