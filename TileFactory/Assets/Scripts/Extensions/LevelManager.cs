@@ -71,6 +71,9 @@ public class LevelManager : Monobehavior
                     case "Support - Foreground":
                         tileEntity = new Support();
                         break;
+                    case "Goal":
+                        tileEntity = new Goal();
+                        break;
                     default:
                         break;
                 }
@@ -104,6 +107,9 @@ public class LevelManager : Monobehavior
                         break;
                     case "Support - Background":
                         tileEntity = new Support();
+                        break;
+                    case "Goal":
+                        tileEntity = new Goal();
                         break;
                     default:
                         break;
@@ -161,6 +167,8 @@ public class LevelManager : Monobehavior
                     case "Water":
                         break;
                     case "Support - Background":
+                        break;
+                    case "Goal":
                         break;
                     default:
                         break;
