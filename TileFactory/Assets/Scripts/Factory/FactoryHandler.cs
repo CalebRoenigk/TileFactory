@@ -9,13 +9,20 @@ namespace Factory
 {
     public class FactoryHandler : MonoBehaviour
     {
+        [Header("Grid")]
         [SerializeField] private Grid grid;
 
+        [Header("Tilemaps")]
         [SerializeField] private Tilemap foreground;
         [SerializeField] private Tilemap background;
         [SerializeField] private Tilemap entity;
-
+        
+        [Header("Prefab Data")]
         [SerializeField] private TileBase box;
+
+        [Header("Player")]
+        [SerializeField] private Dictionary<Entity, int> inventory = new Dictionary<Entity, int>();
+        [SerializeField] private int inventoryIndex = 0;
 
         private void Start()
         {
@@ -32,6 +39,77 @@ namespace Factory
             foreach (Entity cargo in grid.cargo)
             {
                 entity.SetTile((Vector3Int)cargo.position, box);
+            }
+        }
+
+        private void Update()
+        {
+            // Placement of tile
+            if (inventory.ElementAt(inventoryIndex) > 0)
+            {
+                // Can place the selected inventory item
+                if (Input.GetMouseUp(0))
+                {
+                    // User clicked left, attempt placement
+                    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    Vector2Int gridPosition = new Vector2Int((int)Mathf.Floor(worldPosition.x), (int)Mathf.Floor(worldPosition.y));
+                    AttemptTilePlacement(inventory.Keys.ToArray()[inventoryIndex], gridPosition);
+                }
+            }
+            
+            // Removal of tile
+            if (Input.GetMouseUp(1))
+            {
+                // User clicked right, attempt removal
+                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector2Int gridPosition = new Vector2Int((int)Mathf.Floor(worldPosition.x), (int)Mathf.Floor(worldPosition.y));
+                AttemptTileRemoval(gridPosition);
+            }
+        }
+        
+        // Attempt to place a tile from the inventory
+        private void AttemptTilePlacement(Entity entity, Vector2Int position)
+        {
+            // Set the entity to removeable
+            entity.isRemoveable = true;
+            
+            bool tilePlaced = grid.PlaceEntity(entity, position);
+            if (tilePlaced)
+            {
+                // The tile was placed, remove 1 count from the item in the inventory
+                inventory[entity]--;
+            }
+        }
+        
+        // Attempt to remove a tile from the grid and place it in inventory
+        private void AttemptTileRemoval(Vector2Int position)
+        {
+            if (grid.EntityRemoveable(position))
+            {
+                // Get the entity from the grid
+                Entity removeableEntity = grid.GetTileAtPosition(position);
+                
+                // Create a new instance of the object type for storage in the inventory
+                Object inventoryEntity = (typeof(removeableEntity))Activator.CreateInstance(typeof(removeableEntity));
+                
+                // Remove the entity from the grid
+                grid.RemoveEntity(removeableEntity);
+
+                // Add the entity to the inventory
+                AddEnityToInventory(inventoryEntity);
+            }
+        }
+        
+        // Adds an entity to the inventory
+        private void AddEnityToInventory(Entity entity, int count = 1)
+        {
+            if (inventory.Contains(entity))
+            {
+                inventory[entity] += count;
+            }
+            else
+            {
+                inventory.Add(entity, count);
             }
         }
     }

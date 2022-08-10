@@ -19,6 +19,7 @@ namespace Factory.Objects
         
         public bool hasGravity;
         public bool isSolid;
+        public bool isRemoveable;
         
         public bool willMove;
         public Vector2Int moveTo;
@@ -28,6 +29,7 @@ namespace Factory.Objects
         {
             this.isSolid = false;
             this.hasGravity = false;
+            this.isRemoveable = false;
             this.isOnGoal = false;
         }
 
@@ -37,6 +39,7 @@ namespace Factory.Objects
             
             this.isSolid = false;
             this.hasGravity = false;
+            this.isRemoveable = false;
             this.isOnGoal = false;
         }
         
@@ -47,6 +50,7 @@ namespace Factory.Objects
             
             this.isSolid = false;
             this.hasGravity = false;
+            this.isRemoveable = false;
             this.isOnGoal = false;
         }
         
@@ -57,6 +61,7 @@ namespace Factory.Objects
             
             this.isSolid = isSolid;
             this.hasGravity = hasGravity;
+            this.isRemoveable = false;
             this.isOnGoal = false;
         }
         

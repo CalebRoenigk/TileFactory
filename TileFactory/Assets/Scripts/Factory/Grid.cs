@@ -12,6 +12,7 @@ namespace Factory
     {
         public BoundsInt bounds;
 
+        // TODO: Maybe see about making the grid of level tiles into a single tile map with z position as well and using z position to place multiple tiles within 1 tile map at different depths as opposed to two or more layers
         public Entity[,] foreground;
         public Entity[,] background;
 
@@ -176,6 +177,27 @@ namespace Factory
                 cargo.Remove(entity);
                 return;
             }
+        }
+        
+        // Places a tile at a position if the position is empty
+        public bool PlaceEntity(Entity entity, Vector2Int position)
+        {
+            if (CheckPosition(position))
+            {
+                // The position is empty, store the entity at the position
+                foreground[position.x, position.y] = entity;
+                return true;
+            }
+
+            return false;
+        }
+        
+        // Tests if the entity is removeable
+        public bool EntityRemoveable(Vector2Int position)
+        {
+            Entity selectedTile = GetTileAtPosition(position);
+
+            return selectedTile.isRemoveable;
         }
     }
 }
