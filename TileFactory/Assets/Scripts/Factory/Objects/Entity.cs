@@ -22,11 +22,13 @@ namespace Factory.Objects
         
         public bool willMove;
         public Vector2Int moveTo;
+        public bool isOnGoal;
 
         public Entity()
         {
             this.isSolid = false;
             this.hasGravity = false;
+            this.isOnGoal = false;
         }
 
         public Entity(Grid grid)
@@ -35,6 +37,7 @@ namespace Factory.Objects
             
             this.isSolid = false;
             this.hasGravity = false;
+            this.isOnGoal = false;
         }
         
         public Entity(Grid grid, Vector2Int position)
@@ -44,6 +47,7 @@ namespace Factory.Objects
             
             this.isSolid = false;
             this.hasGravity = false;
+            this.isOnGoal = false;
         }
         
         public Entity(Grid grid, Vector2Int position, bool isSolid, bool hasGravity)
@@ -53,6 +57,7 @@ namespace Factory.Objects
             
             this.isSolid = isSolid;
             this.hasGravity = hasGravity;
+            this.isOnGoal = false;
         }
         
         // The checking update
@@ -85,12 +90,19 @@ namespace Factory.Objects
             moveTo = position;
         }
         
+        // The main update
         public void Update()
         {
             if (willMove)
             {
                 position = moveTo;
             }
+        }
+
+        // The post update
+        public void PostUpdate()
+        {
+            isOnGoal = grid.IsOnGoal(position + Vector2Int.down);
         }
     }
 }

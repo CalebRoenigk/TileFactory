@@ -17,6 +17,8 @@ namespace Factory
 
         public List<Entity> cargo = new List<Entity>();
 
+        public int goalScore = 0;
+
         public Grid()
         {
             
@@ -92,8 +94,11 @@ namespace Factory
                 cargoObject.Update();
             }
             
-            // TODO: REIMPLEMENT UPDATE SO ITS DONE IN 3 STAGES
-            // STAGE 3 IS CHECKING GOALS
+            // Check each cargo and see if it is on a goal
+            foreach (Entity cargoObject in cargo)
+            {
+                cargoObject.PostUpdate();
+            }
         }
         
         // Adds a entity to the grid
@@ -103,6 +108,12 @@ namespace Factory
             {
                 cargo.Add(new Box(this, position));
             }
+        }
+        
+        // Returns true if the position is a goal object OR if the position is an object on the goal
+        public bool IsOnGoal(Vector2Int position)
+        {
+            return foreground.FindIndex(e => e.position == position && (e.isOnGoal || e.GetType().Equals(typeof(Goal))));
         }
     }
 }
