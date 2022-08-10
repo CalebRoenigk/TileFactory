@@ -10,8 +10,8 @@ namespace Factory
     [System.Serializable]
     public class Grid
     {
-        public Vector2Int size;
-        
+        public BoundsInt bounds;
+
         public Entity[,] foreground;
         public Entity[,] background;
 
@@ -26,8 +26,11 @@ namespace Factory
 
         public Grid(Vector2Int size)
         {
-            this.size = size;
-            
+            this.bounds = new BoundsInt();
+            Vector3Int boundsMax = (Vector3Int)size;
+            boundsMax.z = 1;
+            this.bounds.SetMinMax((Vector3Int)Vector2Int.zero, boundsMax);
+
             this.foreground = new Entity[size.x, size.y];
             this.background = new Entity[size.x, size.y];
 
@@ -50,12 +53,18 @@ namespace Factory
         // Checks if a position is open
         public bool CheckPosition(Vector2Int position)
         {
+            // Out of bounds tiles
+            if (!bounds.Contains(position))
+            {
+                return false;
+            }
+            
             // Solid Tiles
             if (!foreground[position.x, position.y].isSolid)
             {
                 return true;
             }
-            
+
             // Cargo Tiles
             if (cargo.FindIndex(c => c.position == position) != -1)
             {
@@ -79,9 +88,9 @@ namespace Factory
             }
 
             // Iterate and go bottom to top and right to left to update
-            for (int y = size.y - 1; y > -1; y--)
+            for (int y = bounds.size.y - 1; y > -1; y--)
             {
-                for (int x = size.x - 1; x > -1; x--)
+                for (int x = bounds.size.x - 1; x > -1; x--)
                 {
                     this.foreground[x, y].Update();
                     this.background[x, y].Update();
@@ -125,6 +134,42 @@ namespace Factory
         public bool IsOnGoal(Vector2Int position)
         {
             return foreground.FindIndex(e => e.position == position && (e.isOnGoal || e.GetType().Equals(typeof(Goal))));
+        }
+        
+        // Removes an entity from the grid, handles them differently depending on what type of entity they are
+        public void RemoveEntity(Entity entity)
+        {
+            if (foreground.Contains(entity) || background.Contains(entity))
+            {
+                Vector2Int position = entity.position;
+                Entity replacementEntity = new Entity(this, position);
+                
+                // Tile based removal
+                if (foreground.Contains(entity))
+                {
+                    foreground[position.x, position.y] = replacementEntity;
+                    return;
+                }
+                if (background.Contains(entity))
+                {
+                    background[position.x, position.y] = replacementEntity;
+                    return;
+                }
+            }
+
+            if (cargo.Contains(entity))
+            {
+                // Cargo based removal
+                // Check if the on goal entities contains this entity
+                if (onGoalEntities.Contains(entity))
+                {
+                    onGoalEntities.Remove(entity);
+                }
+                
+                // Remove the cargo from the cargo list
+                cargo.Remove(entity);
+                return;
+            }
         }
     }
 }

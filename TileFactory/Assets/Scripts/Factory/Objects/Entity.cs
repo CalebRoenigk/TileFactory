@@ -70,7 +70,7 @@ namespace Factory.Objects
                 {
                     // Can move down
                     willMove = true;
-                    moveTo = position + Vector2Int.down;
+                    moveTo = Vector2Int.down;
                     return;
                 }
                 else
@@ -80,14 +80,14 @@ namespace Factory.Objects
                     if (objectBelow != null && objectBelow.movementDirection != Vector2Int.zero)
                     {
                         willMove = true;
-                        moveTo = position + objectBelow.movementDirection;
+                        moveTo = objectBelow.movementDirection;
                         return;
                     }
                 }
             }
 
             willMove = false;
-            moveTo = position;
+            moveTo = Vector2Int.zero;
         }
         
         // The main update
@@ -95,7 +95,7 @@ namespace Factory.Objects
         {
             if (willMove)
             {
-                position = moveTo;
+                position += moveTo;
             }
         }
 
@@ -103,6 +103,13 @@ namespace Factory.Objects
         public void PostUpdate()
         {
             isOnGoal = grid.IsOnGoal(position + Vector2Int.down);
+        }
+        
+        // Destroies the entity
+        public void DestroyEntity()
+        {
+            // Remove the entity from the grid
+            grid.RemoveEntity(this);
         }
     }
 }

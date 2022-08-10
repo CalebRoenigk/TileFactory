@@ -8,6 +8,9 @@ namespace Factory.Objects
 {
     public class Box : Entity
     {
+        public int fallDistance;
+        public int maxFallDistance;
+        
         public Box()
         {
             this.hasGravity = true;
@@ -22,13 +25,42 @@ namespace Factory.Objects
             
             this.hasGravity = true;
             this.isSolid = true;
+
+            maxFallDistance = 3;
         }
         
         // The checking update
         public void PreUpdate()
         {
-            Debug.Log("Hello!");
             base.PreUpdate();
+        }
+        
+        // The main update
+        public void Update()
+        {
+            base.Update();
+
+            if (moveTo.y <= -1)
+            {
+                // Moving down, count fall distance
+                fallDistance += moveTo.y;
+            }
+            
+            else
+            {
+                // Moving not down
+                // Check if the object has fallen farther than the max fall distance
+                if (fallDistance >= maxFallDistance)
+                {
+                    // Object should break
+                    base.DestroyEntity();
+                }
+                else
+                {
+                    // Reset the fall distance
+                    fallDistance = 0;
+                }
+            }
         }
     }
 }
