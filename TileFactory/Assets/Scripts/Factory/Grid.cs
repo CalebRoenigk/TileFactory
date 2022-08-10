@@ -47,6 +47,12 @@ namespace Factory
         // Returns tiles from the foreground
         public Entity GetTileAtPosition(Vector2Int position)
         {
+            // Check if the position is out of bounds and if so return a solid tile with no movement
+            if (!CheckPosition(position))
+            {
+                return new Entity(this, position, true, false);
+            }
+            
             return foreground[position.x, position.y];
         }
         
