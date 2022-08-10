@@ -19,6 +19,7 @@ namespace Factory
         
         [Header("Prefab Data")]
         [SerializeField] private TileBase box;
+        // TODO: Add some kind of lookup for different asset ruletiles for placement when building level
 
         [Header("Player")]
         [SerializeField] private Dictionary<Entity, int> inventory = new Dictionary<Entity, int>();

@@ -180,13 +180,22 @@ namespace Factory
         }
         
         // Places a tile at a position if the position is empty
-        public bool PlaceEntity(Entity entity, Vector2Int position)
+        public bool PlaceEntity(Entity entity, Vector2Int position, int layer = 0)
         {
             if (CheckPosition(position))
             {
                 // The position is empty, store the entity at the position
-                foreground[position.x, position.y] = entity;
-                return true;
+                entity.position = position;
+                switch (layer)
+                {
+                    case 0:
+                    default:
+                        foreground[position.x, position.y] = entity;
+                        return true;
+                    case 1:
+                        background[position.x, position.y] = entity;
+                        return true;
+                }
             }
 
             return false;
