@@ -17,7 +17,7 @@ namespace Factory
 
         public List<Entity> cargo = new List<Entity>();
 
-        public int goalScore = 0;
+        public List<Entity> onGoalEntities = new List<Entity>();
 
         public Grid()
         {
@@ -98,6 +98,17 @@ namespace Factory
             foreach (Entity cargoObject in cargo)
             {
                 cargoObject.PostUpdate();
+                
+                // Update the status of the cargo in relation to the goal
+                if (cargoObject.isOnGoal && !onGoalEntities.Contains(cargoObject))
+                {
+                    onGoalEntities.Add(cargoObject);
+                }
+
+                if (!cargoObject.isOnGoal && onGoalEntities.Contains(cargoObject))
+                {
+                    onGoalEntities.Remove(cargoObject);
+                }
             }
         }
         
