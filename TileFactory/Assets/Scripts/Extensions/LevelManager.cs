@@ -155,6 +155,11 @@ public class LevelManager : Monobehavior
             {
                 Entity entityForeground = foreground[x, y];
                 Entity entityBackground = background[x, y];
+                Vector3Int position = new Vector3Int(x, y, 0);
+                TileBase foregroundTile = new TileBase();
+                TileBase backgroundTile = new TileBase();
+                bool tileInForeground = true;
+                bool tileInBackground = true;
 
                 switch (entityForeground.GetType())
                 {
@@ -171,7 +176,35 @@ public class LevelManager : Monobehavior
                     case "Goal":
                         break;
                     default:
+                        tileInForeground = false;
                         break;
+                }
+                switch (entityBackground.GetType())
+                {
+                    case "Terrain - Sides":
+                        break;
+                    case "Terrain - Top":
+                        break;
+                    case "Terrain - Solo Top":
+                        break;
+                    case "Water":
+                        break;
+                    case "Support - Background":
+                        break;
+                    case "Goal":
+                        break;
+                    default:
+                        tileInBackground = false;
+                        break;
+                }
+
+                if (tileInForeground)
+                {
+                    foreground.SetTile(position, foregroundTile);
+                }
+                if (tileInBackground)
+                {
+                    background.SetTile(position, backgroundTile);
                 }
             }
         }
