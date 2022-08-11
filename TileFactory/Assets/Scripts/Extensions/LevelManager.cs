@@ -14,6 +14,8 @@ public class LevelManager : MonoBehaviour
 {
     [SerializeField] private Tilemap foreground;
     [SerializeField] private Tilemap background;
+    [SerializeField] private Tilemap entity;
+    [SerializeField] private FactoryHandler factoryHandler;
     [SerializeField] private int levelIndex;
     
     // Save a level map
@@ -21,30 +23,36 @@ public class LevelManager : MonoBehaviour
     {
         // Create a new level data object
         LevelData newLevel = ScriptableObject.CreateInstance<LevelData>();
-
+    
         // Set the general props
         newLevel.levelIndex = levelIndex;
         newLevel.name = $"Level " + levelIndex;
         
         // Create the grid that will store the level data
         // Compress the bounds of both tilemaps
-        foreground.CompressBounds();
-        background.CompressBounds();
+        // foreground.CompressBounds();
+        // background.CompressBounds();
+        // entity.CompressBounds();
         
         // Determine the level bounds using the sizes of both
         BoundsInt foregroundBounds = foreground.cellBounds;
         BoundsInt backgroundBounds = background.cellBounds;
-
-        Vector3Int minBounds = new Vector3Int((int)Mathf.Min(foregroundBounds.xMin, backgroundBounds.xMin), (int)Mathf.Min(foregroundBounds.yMin, backgroundBounds.yMin), (int)Mathf.Min(foregroundBounds.zMin, backgroundBounds.zMin));
-        Vector3Int maxBounds = new Vector3Int((int)Mathf.Min(foregroundBounds.xMax, backgroundBounds.xMax), (int)Mathf.Min(foregroundBounds.yMax, backgroundBounds.yMax), (int)Mathf.Min(foregroundBounds.zMax, backgroundBounds.zMax));
+        BoundsInt entityBounds = entity.cellBounds;
+    
+        Vector3Int minBounds = new Vector3Int((int)Mathf.Min(foregroundBounds.xMin, backgroundBounds.xMin, entityBounds.xMin), (int)Mathf.Min(foregroundBounds.yMin, backgroundBounds.yMin, entityBounds.yMin), (int)Mathf.Min(foregroundBounds.zMin, backgroundBounds.zMin));
+        Vector3Int maxBounds = new Vector3Int((int)Mathf.Max(foregroundBounds.xMax, backgroundBounds.xMax, entityBounds.xMax), (int)Mathf.Max(foregroundBounds.yMax, backgroundBounds.yMax, entityBounds.yMax), (int)Mathf.Max(foregroundBounds.zMax, backgroundBounds.zMax));
+        
+        Debug.Log(foregroundBounds.ToString() + backgroundBounds.ToString());
         
         // Create the grid bounds
         BoundsInt gridBounds = new BoundsInt();
         gridBounds.SetMinMax(minBounds, maxBounds);
+
+        Debug.Log(gridBounds.ToString());
         
         // Create the grid
         Grid levelGrid = new Grid(new Vector2Int(gridBounds.size.z, gridBounds.size.y));
-
+    
         // Iterate over the foreground and background to get the level tiles and store them in the grid
         Vector3Int foregroundOffset = -foregroundBounds.min;
         foreach(Vector3Int cell in foregroundBounds.allPositionsWithin)
@@ -92,7 +100,7 @@ public class LevelManager : MonoBehaviour
             {
                 Vector2Int gridPosition = (Vector2Int)(backgroundOffset + cell);
                 Entity tileEntity = new Entity();
-
+    
                 // Cast the entity as a type based on the tile name
                 switch(background.GetTile(cell).name)
                 {
@@ -121,9 +129,21 @@ public class LevelManager : MonoBehaviour
                 levelGrid.PlaceEntity(tileEntity, (Vector2Int)gridPosition, 1);
             }
         }
-            
+        
+        // Get all the Cargo
+        Vector3Int entityOffset = -entityBounds.min;
+        foreach (Vector3Int cell in entityBounds.allPositionsWithin)
+        {
+            if (entity.HasTile(cell))
+            {
+                levelGrid.cargo.Add(new Box(levelGrid, new Vector2Int(cell.x + entityOffset.x, cell.y + entityOffset.y)));
+            }
+        }
+
         // Store the level grid
         newLevel.grid = levelGrid;
+        
+        Debug.Log(levelGrid.foreground.GetLength(0));
         
         // Save the level
         ScriptableObjectUtility.SaveLevelFile(newLevel);
@@ -133,13 +153,13 @@ public class LevelManager : MonoBehaviour
     public void ClearMap()
     {
         Tilemap[] tilemaps = FindObjectsOfType<Tilemap>();
-
+    
         foreach (Tilemap tilemap in tilemaps)
         {
             tilemap.ClearAllTiles();
         }
     }
-
+    
     public void LoadMap()
     {
         LevelData level = Resources.Load<LevelData>($"Levels/Level {levelIndex}");
@@ -148,62 +168,64 @@ public class LevelManager : MonoBehaviour
             Debug.LogError($"Level {levelIndex} does not exist.");
             return;
         }
+    
+        // ClearMap();
 
-        ClearMap();
+        factoryHandler.SetLevel(level.grid);
 
-        // TODO: Make tiles be placed. Need to determine how to do resource dict for tiles to match their entities
-        for (int x = 0; x < level.grid.bounds.size.x; x++)
-        {
-            for (int y = 0; y < level.grid.bounds.size.y; y++)
-            {
-                Entity entityForeground = level.grid.foreground[x, y];
-                Entity entityBackground = level.grid.background[x, y];
-                Vector3Int position = new Vector3Int(x, y, 0);
-                TileBase foregroundTile = new Tile();
-                TileBase backgroundTile = new Tile();
-                bool tileInForeground = true;
-                bool tileInBackground = true;
-
-                switch (entityForeground.GetType().ToString())
-                {
-                    case "Terrain":
-                        // TODO: SUPPORT TERRAIN TYPES
-                        break;
-                    case "Water":
-                        break;
-                    case "Support":
-                        break;
-                    case "Goal":
-                        break;
-                    default:
-                        tileInForeground = false;
-                        break;
-                }
-                switch (entityBackground.GetType().ToString())
-                {
-                    case "Terrain":
-                        break;
-                    case "Water":
-                        break;
-                    case "Support":
-                        break;
-                    case "Goal":
-                        break;
-                    default:
-                        tileInBackground = false;
-                        break;
-                }
-
-                if (tileInForeground)
-                {
-                    foreground.SetTile(position, foregroundTile);
-                }
-                if (tileInBackground)
-                {
-                    background.SetTile(position, backgroundTile);
-                }
-            }
-        }
+        // // TODO: Make tiles be placed. Need to determine how to do resource dict for tiles to match their entities
+        // for (int x = 0; x < level.grid.bounds.size.x; x++)
+        // {
+        //     for (int y = 0; y < level.grid.bounds.size.y; y++)
+        //     {
+        //         Entity entityForeground = level.grid.foreground[x, y];
+        //         Entity entityBackground = level.grid.background[x, y];
+        //         Vector3Int position = new Vector3Int(x, y, 0);
+        //         TileBase foregroundTile = new Tile();
+        //         TileBase backgroundTile = new Tile();
+        //         bool tileInForeground = true;
+        //         bool tileInBackground = true;
+        //
+        //         switch (entityForeground.GetType().ToString())
+        //         {
+        //             case "Terrain":
+        //                 // TODO: SUPPORT TERRAIN TYPES
+        //                 break;
+        //             case "Water":
+        //                 break;
+        //             case "Support":
+        //                 break;
+        //             case "Goal":
+        //                 break;
+        //             default:
+        //                 tileInForeground = false;
+        //                 break;
+        //         }
+        //         switch (entityBackground.GetType().ToString())
+        //         {
+        //             case "Terrain":
+        //                 break;
+        //             case "Water":
+        //                 break;
+        //             case "Support":
+        //                 break;
+        //             case "Goal":
+        //                 break;
+        //             default:
+        //                 tileInBackground = false;
+        //                 break;
+        //         }
+        //
+        //         if (tileInForeground)
+        //         {
+        //             foreground.SetTile(position, foregroundTile);
+        //         }
+        //         if (tileInBackground)
+        //         {
+        //             background.SetTile(position, backgroundTile);
+        //         }
+        //     }
+        // }
     }
 }
 

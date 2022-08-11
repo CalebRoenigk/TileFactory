@@ -26,10 +26,15 @@ namespace Factory
         [SerializeField] private Dictionary<Entity, int> inventory = new Dictionary<Entity, int>();
         [SerializeField] private int inventoryIndex = 0;
 
+        // private void Start()
+        // {
+        //     grid = new Grid(new Vector2Int(12, 300));
+        //     grid.AddEntity(new Vector2Int(8, 25));
+        // }
+
         private void Start()
         {
-            grid = new Grid(new Vector2Int(12, 300));
-            grid.AddEntity(new Vector2Int(8, 25));
+            Debug.Log(grid.foreground.GetLength(0));
         }
 
         private void FixedUpdate()
@@ -44,30 +49,30 @@ namespace Factory
             }
         }
 
-        private void Update()
-        {
-            // Placement of tile
-            if (inventory.ElementAt(inventoryIndex).Value > 0)
-            {
-                // Can place the selected inventory item
-                if (Input.GetMouseButtonUp(0))
-                {
-                    // User clicked left, attempt placement
-                    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    Vector2Int gridPosition = new Vector2Int((int)Mathf.Floor(worldPosition.x), (int)Mathf.Floor(worldPosition.y));
-                    AttemptTilePlacement(inventory.Keys.ToArray()[inventoryIndex], gridPosition);
-                }
-            }
-            
-            // Removal of tile
-            if (Input.GetMouseButtonUp(1))
-            {
-                // User clicked right, attempt removal
-                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Vector2Int gridPosition = new Vector2Int((int)Mathf.Floor(worldPosition.x), (int)Mathf.Floor(worldPosition.y));
-                AttemptTileRemoval(gridPosition);
-            }
-        }
+        // private void Update()
+        // {
+        //     // Placement of tile
+        //     if (inventory.ElementAt(inventoryIndex).Value > 0)
+        //     {
+        //         // Can place the selected inventory item
+        //         if (Input.GetMouseButtonUp(0))
+        //         {
+        //             // User clicked left, attempt placement
+        //             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //             Vector2Int gridPosition = new Vector2Int((int)Mathf.Floor(worldPosition.x), (int)Mathf.Floor(worldPosition.y));
+        //             AttemptTilePlacement(inventory.Keys.ToArray()[inventoryIndex], gridPosition);
+        //         }
+        //     }
+        //     
+        //     // Removal of tile
+        //     if (Input.GetMouseButtonUp(1))
+        //     {
+        //         // User clicked right, attempt removal
+        //         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //         Vector2Int gridPosition = new Vector2Int((int)Mathf.Floor(worldPosition.x), (int)Mathf.Floor(worldPosition.y));
+        //         AttemptTileRemoval(gridPosition);
+        //     }
+        // }
         
         // Attempt to place a tile from the inventory
         private void AttemptTilePlacement(Entity entity, Vector2Int position)
@@ -113,6 +118,12 @@ namespace Factory
             {
                 inventory.Add(entity, count);
             }
+        }
+        
+        // Loads the level in
+        public void SetLevel(Grid grid)
+        {
+            this.grid = grid;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Factory.Data
     public struct EntityResource
     {
         public string name;
-        public Entity entity;
+        public System.Type entityType;
         public TileBase tileBase;
     }
 }

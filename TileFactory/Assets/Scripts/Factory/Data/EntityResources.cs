@@ -17,7 +17,7 @@ namespace Factory.Data
         // Returns a tilebase of an entity given the entity
         public TileBase GetEntityTileBase(Entity entity)
         {
-            int entityIndex = entityResources.FindIndex(e => e.entity.GetType() == entity.GetType());
+            int entityIndex = entityResources.FindIndex(e => e.entityType == entity.GetType());
             if (entityIndex != -1)
             {
                 return entityResources[entityIndex].tileBase;
@@ -27,15 +27,15 @@ namespace Factory.Data
         }
         
         // Return an entity from a given tilebase
-        public Entity GetEntity(TileBase tile)
+        public Type GetEntity(TileBase tile)
         {
             int entityIndex = entityResources.FindIndex(e => e.tileBase.GetType() == tile.GetType());
             if (entityIndex != -1)
             {
-                return entityResources[entityIndex].entity;
+                return entityResources[entityIndex].entityType;
             }
 
-            return new Entity();
+            return new Entity().GetType();
         }
     }
 }

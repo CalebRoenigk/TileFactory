@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97411b6b316b34fdea5cf6a41c4163f3, type: 3}
+  m_Name: EntityResources
+  m_EditorClassIdentifier: 
+  entityResources:
+  - name: Terrain
+    tileBase: {fileID: 11400000, guid: a5698e750ab5741c58619b45851e4872, type: 2}
+  - name: 
+    tileBase: {fileID: 0}
+  - name: 
+    tileBase: {fileID: 0}

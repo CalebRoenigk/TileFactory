@@ -4,13 +4,14 @@ using UnityEngine;
 
 namespace UnityEditor
 {
+    [CustomEditor(typeof(LevelManager))]
     public class LevelManagerEditor : Editor
     {
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
 
-            LevelManager script = (LevelManager) target;
+            var script = (LevelManager) target;
 
             if (GUILayout.Button("Save Level"))
             {

@@ -29,6 +29,7 @@ namespace UnityEditor
                     return;
                 case 6:
                     GUI.DrawTexture(rect, notspecified);
+                    return;
             }
 
             base.RuleOnGUI(rect, position, neighbor);
