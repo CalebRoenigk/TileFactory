@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using Factory.Objects;
@@ -46,10 +47,10 @@ namespace Factory
         private void Update()
         {
             // Placement of tile
-            if (inventory.ElementAt(inventoryIndex) > 0)
+            if (inventory.ElementAt(inventoryIndex).Value > 0)
             {
                 // Can place the selected inventory item
-                if (Input.GetMouseUp(0))
+                if (Input.GetMouseButtonUp(0))
                 {
                     // User clicked left, attempt placement
                     Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -59,7 +60,7 @@ namespace Factory
             }
             
             // Removal of tile
-            if (Input.GetMouseUp(1))
+            if (Input.GetMouseButtonUp(1))
             {
                 // User clicked right, attempt removal
                 Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -91,20 +92,20 @@ namespace Factory
                 Entity removeableEntity = grid.GetTileAtPosition(position);
                 
                 // Create a new instance of the object type for storage in the inventory
-                Object inventoryEntity = (typeof(removeableEntity))Activator.CreateInstance(typeof(removeableEntity));
+                System.Object inventoryEntity = Activator.CreateInstance(removeableEntity.GetType());
                 
                 // Remove the entity from the grid
                 grid.RemoveEntity(removeableEntity);
 
                 // Add the entity to the inventory
-                AddEnityToInventory(inventoryEntity);
+                AddEnityToInventory((Entity)inventoryEntity);
             }
         }
         
         // Adds an entity to the inventory
         private void AddEnityToInventory(Entity entity, int count = 1)
         {
-            if (inventory.Contains(entity))
+            if (inventory.ContainsKey(entity))
             {
                 inventory[entity] += count;
             }

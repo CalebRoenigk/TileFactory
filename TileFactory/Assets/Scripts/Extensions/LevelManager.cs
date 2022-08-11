@@ -4,10 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEditor;
 using Factory;
 using Factory.Objects;
+using Factory.Data;
+using Grid = Factory.Grid;
 
-public class LevelManager : Monobehavior
+public class LevelManager : MonoBehaviour
 {
     [SerializeField] private Tilemap foreground;
     [SerializeField] private Tilemap background;
@@ -40,7 +43,7 @@ public class LevelManager : Monobehavior
         gridBounds.SetMinMax(minBounds, maxBounds);
         
         // Create the grid
-        Grid levelGrid = public Grid(new Vector2Int(gridBounds.size.z, gridBounds.size.y));
+        Grid levelGrid = new Grid(new Vector2Int(gridBounds.size.z, gridBounds.size.y));
 
         // Iterate over the foreground and background to get the level tiles and store them in the grid
         Vector3Int foregroundOffset = -foregroundBounds.min;
@@ -48,7 +51,7 @@ public class LevelManager : Monobehavior
         {
             if (foreground.HasTile(cell))
             {
-                Vector2Int gridPosition = foregroundOffset + cell;
+                Vector2Int gridPosition = (Vector2Int)(foregroundOffset + cell);
                 Entity tileEntity = new Entity();
             
                 // TODO: Rename Terrain - SIdes as Terrain - Sides
@@ -57,13 +60,13 @@ public class LevelManager : Monobehavior
                 switch(foreground.GetTile(cell).name)
                 {
                     case "Terrain - Sides":
-                        tileEntity = new Terrain(0);
+                        tileEntity = new Factory.Objects.Terrain(0);
                         break;
                     case "Terrain - Top":
-                        tileEntity = new Terrain(1);
+                        tileEntity = new Factory.Objects.Terrain(1);
                         break;
                     case "Terrain - Solo Top":
-                        tileEntity = new Terrain(2);
+                        tileEntity = new Factory.Objects.Terrain(2);
                         break;
                     case "Water":
                         tileEntity = new Water();
@@ -87,20 +90,20 @@ public class LevelManager : Monobehavior
         {
             if (background.HasTile(cell))
             {
-                Vector2Int gridPosition = backgroundOffset + cell;
+                Vector2Int gridPosition = (Vector2Int)(backgroundOffset + cell);
                 Entity tileEntity = new Entity();
 
                 // Cast the entity as a type based on the tile name
                 switch(background.GetTile(cell).name)
                 {
                     case "Terrain - Sides":
-                        tileEntity = new Terrain(0);
+                        tileEntity = new Factory.Objects.Terrain(0);
                         break;
                     case "Terrain - Top":
-                        tileEntity = new Terrain(1);
+                        tileEntity = new Factory.Objects.Terrain(1);
                         break;
                     case "Terrain - Solo Top":
-                        tileEntity = new Terrain(2);
+                        tileEntity = new Factory.Objects.Terrain(2);
                         break;
                     case "Water":
                         tileEntity = new Water();
@@ -149,29 +152,26 @@ public class LevelManager : Monobehavior
         ClearMap();
 
         // TODO: Make tiles be placed. Need to determine how to do resource dict for tiles to match their entities
-        for (int x = 0; x < level.grid.size.x; x++)
+        for (int x = 0; x < level.grid.bounds.size.x; x++)
         {
-            for (int y = 0; y < level.grid.size.y; y++)
+            for (int y = 0; y < level.grid.bounds.size.y; y++)
             {
-                Entity entityForeground = foreground[x, y];
-                Entity entityBackground = background[x, y];
+                Entity entityForeground = level.grid.foreground[x, y];
+                Entity entityBackground = level.grid.background[x, y];
                 Vector3Int position = new Vector3Int(x, y, 0);
-                TileBase foregroundTile = new TileBase();
-                TileBase backgroundTile = new TileBase();
+                TileBase foregroundTile = new Tile();
+                TileBase backgroundTile = new Tile();
                 bool tileInForeground = true;
                 bool tileInBackground = true;
 
-                switch (entityForeground.GetType())
+                switch (entityForeground.GetType().ToString())
                 {
-                    case "Terrain - Sides":
-                        break;
-                    case "Terrain - Top":
-                        break;
-                    case "Terrain - Solo Top":
+                    case "Terrain":
+                        // TODO: SUPPORT TERRAIN TYPES
                         break;
                     case "Water":
                         break;
-                    case "Support - Background":
+                    case "Support":
                         break;
                     case "Goal":
                         break;
@@ -179,17 +179,13 @@ public class LevelManager : Monobehavior
                         tileInForeground = false;
                         break;
                 }
-                switch (entityBackground.GetType())
+                switch (entityBackground.GetType().ToString())
                 {
-                    case "Terrain - Sides":
-                        break;
-                    case "Terrain - Top":
-                        break;
-                    case "Terrain - Solo Top":
+                    case "Terrain":
                         break;
                     case "Water":
                         break;
-                    case "Support - Background":
+                    case "Support":
                         break;
                     case "Goal":
                         break;

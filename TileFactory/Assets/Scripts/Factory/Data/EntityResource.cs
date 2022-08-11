@@ -12,7 +12,7 @@ namespace Factory.Data
     [System.Serializable]
     public struct EntityResource
     {
-        public sting name;
+        public string name;
         public Entity entity;
         public TileBase tileBase;
     }

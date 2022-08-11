@@ -61,7 +61,7 @@ namespace Factory
         public bool CheckPosition(Vector2Int position)
         {
             // Out of bounds tiles
-            if (!bounds.Contains(position))
+            if (!bounds.Contains(new Vector3Int(position.x, position.y, 0)))
             {
                 return false;
             }
@@ -140,24 +140,26 @@ namespace Factory
         // Returns true if the position is a goal object OR if the position is an object on the goal
         public bool IsOnGoal(Vector2Int position)
         {
-            return foreground.FindIndex(e => e.position == position && (e.isOnGoal || e.GetType().Equals(typeof(Goal))));
+            Entity entity = GetTileAtPosition(position);
+            
+            return  entity.isOnGoal || entity.GetType() == typeof(Goal);
         }
         
         // Removes an entity from the grid, handles them differently depending on what type of entity they are
         public void RemoveEntity(Entity entity)
         {
-            if (foreground.Contains(entity) || background.Contains(entity))
+            if (bounds.Contains(new Vector3Int(entity.position.x, entity.position.y, 0)))
             {
                 Vector2Int position = entity.position;
                 Entity replacementEntity = new Entity(this, position);
                 
                 // Tile based removal
-                if (foreground.Contains(entity))
+                if (foreground[entity.position.x, entity.position.y].GetType() == entity.GetType())
                 {
                     foreground[position.x, position.y] = replacementEntity;
                     return;
                 }
-                if (background.Contains(entity))
+                if (background[entity.position.x, entity.position.y].GetType() == entity.GetType())
                 {
                     background[position.x, position.y] = replacementEntity;
                     return;
