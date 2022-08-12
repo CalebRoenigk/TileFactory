@@ -11,7 +11,7 @@ namespace Factory.Objects
     [System.Serializable]
     public class Entity
     {
-        public Grid grid;
+        [System.NonSerialized]private Grid grid;
 
         public Vector2Int position;
 

@@ -17,12 +17,8 @@ namespace Factory.Objects
             this.isSolid = true;
         }
         
-        public Box(Grid grid, Vector2Int position)
+        public Box(Grid grid, Vector2Int position): base(grid, position)
         {
-            this.grid = grid;
-
-            this.position = position;
-            
             this.hasGravity = true;
             this.isSolid = true;
 

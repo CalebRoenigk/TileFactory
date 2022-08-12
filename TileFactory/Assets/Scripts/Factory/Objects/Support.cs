@@ -13,5 +13,11 @@ namespace Factory.Objects
             this.isSolid = true;
             this.hasGravity = false;
         }
+        
+        public Support(Grid grid, Vector2Int position): base(grid, position)
+        {
+            this.isSolid = true;
+            this.hasGravity = false;
+        }
     }
 }

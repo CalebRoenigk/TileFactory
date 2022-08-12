@@ -41,112 +41,126 @@ public class LevelManager : MonoBehaviour
     
         Vector3Int minBounds = new Vector3Int((int)Mathf.Min(foregroundBounds.xMin, backgroundBounds.xMin, entityBounds.xMin), (int)Mathf.Min(foregroundBounds.yMin, backgroundBounds.yMin, entityBounds.yMin), (int)Mathf.Min(foregroundBounds.zMin, backgroundBounds.zMin));
         Vector3Int maxBounds = new Vector3Int((int)Mathf.Max(foregroundBounds.xMax, backgroundBounds.xMax, entityBounds.xMax), (int)Mathf.Max(foregroundBounds.yMax, backgroundBounds.yMax, entityBounds.yMax), (int)Mathf.Max(foregroundBounds.zMax, backgroundBounds.zMax));
-        
-        Debug.Log(foregroundBounds.ToString() + backgroundBounds.ToString());
-        
+
         // Create the grid bounds
         BoundsInt gridBounds = new BoundsInt();
         gridBounds.SetMinMax(minBounds, maxBounds);
 
-        Debug.Log(gridBounds.ToString());
-        
         // Create the grid
-        Grid levelGrid = new Grid(new Vector2Int(gridBounds.size.z, gridBounds.size.y));
-    
-        // Iterate over the foreground and background to get the level tiles and store them in the grid
-        Vector3Int foregroundOffset = -foregroundBounds.min;
-        foreach(Vector3Int cell in foregroundBounds.allPositionsWithin)
-        {
-            if (foreground.HasTile(cell))
-            {
-                Vector2Int gridPosition = (Vector2Int)(foregroundOffset + cell);
-                Entity tileEntity = new Entity();
-            
-                // TODO: Rename Terrain - SIdes as Terrain - Sides
-            
-                // Cast the entity as a type based on the tile name
-                switch(foreground.GetTile(cell).name)
-                {
-                    case "Terrain - Sides":
-                        tileEntity = new Factory.Objects.Terrain(0);
-                        break;
-                    case "Terrain - Top":
-                        tileEntity = new Factory.Objects.Terrain(1);
-                        break;
-                    case "Terrain - Solo Top":
-                        tileEntity = new Factory.Objects.Terrain(2);
-                        break;
-                    case "Water":
-                        tileEntity = new Water();
-                        break;
-                    case "Support - Foreground":
-                        tileEntity = new Support();
-                        break;
-                    case "Goal":
-                        tileEntity = new Goal();
-                        break;
-                    default:
-                        break;
-                }
-            
-                levelGrid.PlaceEntity(tileEntity, (Vector2Int)gridPosition, 0);
-            }
-        }
-            
-        Vector3Int backgroundOffset = -backgroundBounds.min;
-        foreach(Vector3Int cell in backgroundBounds.allPositionsWithin)
-        {
-            if (background.HasTile(cell))
-            {
-                Vector2Int gridPosition = (Vector2Int)(backgroundOffset + cell);
-                Entity tileEntity = new Entity();
-    
-                // Cast the entity as a type based on the tile name
-                switch(background.GetTile(cell).name)
-                {
-                    case "Terrain - Sides":
-                        tileEntity = new Factory.Objects.Terrain(0);
-                        break;
-                    case "Terrain - Top":
-                        tileEntity = new Factory.Objects.Terrain(1);
-                        break;
-                    case "Terrain - Solo Top":
-                        tileEntity = new Factory.Objects.Terrain(2);
-                        break;
-                    case "Water":
-                        tileEntity = new Water();
-                        break;
-                    case "Support - Background":
-                        tileEntity = new Support();
-                        break;
-                    case "Goal":
-                        tileEntity = new Goal();
-                        break;
-                    default:
-                        break;
-                }
-            
-                levelGrid.PlaceEntity(tileEntity, (Vector2Int)gridPosition, 1);
-            }
-        }
+        Grid levelGrid = new Grid(new Vector2Int(gridBounds.size.x, gridBounds.size.y));
         
-        // Get all the Cargo
-        Vector3Int entityOffset = -entityBounds.min;
-        foreach (Vector3Int cell in entityBounds.allPositionsWithin)
+        // Get the base offset of the tiles
+        Vector3Int tileOffset = -gridBounds.min;
+
+        // Iterate over the grid foreground entities
+        // Entity[,] foregroundEntities = new Entity[gridBounds.size.x, gridBounds.size.y];
+        List<Entity> foregroundEntities = new List<Entity>();
+        for (int x = 0; x < gridBounds.size.x; x++)
         {
-            if (entity.HasTile(cell))
+            for (int y = 0; y < gridBounds.size.y; y++)
             {
-                levelGrid.cargo.Add(new Box(levelGrid, new Vector2Int(cell.x + entityOffset.x, cell.y + entityOffset.y)));
+                Vector2Int gridPosition = new Vector2Int(x, y);
+                Vector3Int tilePosition = (Vector3Int)gridPosition + tileOffset;
+
+                if (foreground.HasTile(tilePosition))
+                {
+                    // Cast the entity as a type based on the tile name
+                    switch(foreground.GetTile(tilePosition).name)
+                    {
+                        case "Terrain - Sides":
+                            // foregroundEntities[x, y] = new Factory.Objects.Terrain(levelGrid, gridPosition, 0);
+                            foregroundEntities.Add(new Factory.Objects.Terrain(levelGrid, gridPosition, 0));
+                            break;
+                        case "Terrain - Top":
+                            // foregroundEntities[x, y] = new Factory.Objects.Terrain(levelGrid, gridPosition, 1);
+                            foregroundEntities.Add(new Factory.Objects.Terrain(levelGrid, gridPosition, 1));
+                            break;
+                        case "Terrain - Solo Top":
+                            // foregroundEntities[x, y] = new Factory.Objects.Terrain(levelGrid, gridPosition, 2);
+                            foregroundEntities.Add(new Factory.Objects.Terrain(levelGrid, gridPosition, 2));
+                            break;
+                        case "Water":
+                            // foregroundEntities[x, y] = new Water(levelGrid, gridPosition);
+                            foregroundEntities.Add(new Water(levelGrid, gridPosition));
+                            break;
+                        case "Support - Foreground":
+                            // foregroundEntities[x, y] = new Support(levelGrid, gridPosition);
+                            foregroundEntities.Add(new Support(levelGrid, gridPosition));
+                            break;
+                        case "Goal":
+                            // foregroundEntities[x, y] = new Goal(levelGrid, gridPosition);
+                            foregroundEntities.Add(new Goal(levelGrid, gridPosition));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    // foregroundEntities[x, y] = new Entity(levelGrid, gridPosition);
+                }
             }
         }
 
+        newLevel.foreground = foregroundEntities;
+        // levelGrid.foreground = foregroundEntities;
+        
+        
+        // Debug.Log(levelGrid.foreground[0,2]);
+
+        // foreach(Vector3Int cell in backgroundBounds.allPositionsWithin)
+        // {
+        //     if (background.HasTile(cell))
+        //     {
+        //         Vector2Int gridPosition = (Vector2Int)(tileOffset + cell);
+        //         Entity tileEntity = new Entity();
+        //
+        //         // Cast the entity as a type based on the tile name
+        //         switch(background.GetTile(cell).name)
+        //         {
+        //             case "Terrain - Sides":
+        //                 tileEntity = new Factory.Objects.Terrain(0);
+        //                 break;
+        //             case "Terrain - Top":
+        //                 tileEntity = new Factory.Objects.Terrain(1);
+        //                 break;
+        //             case "Terrain - Solo Top":
+        //                 tileEntity = new Factory.Objects.Terrain(2);
+        //                 break;
+        //             case "Water":
+        //                 tileEntity = new Water();
+        //                 break;
+        //             case "Support - Background":
+        //                 tileEntity = new Support();
+        //                 break;
+        //             case "Goal":
+        //                 tileEntity = new Goal();
+        //                 break;
+        //             default:
+        //                 break;
+        //         }
+        //     
+        //         levelGrid.PlaceEntity(tileEntity, (Vector2Int)gridPosition, 1);
+        //     }
+        // }
+        
+        // // Get all the Cargo
+        // foreach (Vector3Int cell in entityBounds.allPositionsWithin)
+        // {
+        //     if (entity.HasTile(cell))
+        //     {
+        //         levelGrid.cargo.Add(new Box(levelGrid, new Vector2Int(cell.x + tileOffset.x, cell.y + tileOffset.y)));
+        //     }
+        // }
+
         // Store the level grid
         newLevel.grid = levelGrid;
-        
-        Debug.Log(levelGrid.foreground.GetLength(0));
-        
+
         // Save the level
         ScriptableObjectUtility.SaveLevelFile(newLevel);
+        
+        // Debug.Log(newLevel.grid.foreground);
+        // Debug.Log(newLevel.grid.foreground[0,2]);
     }
 
     // Clear all tilemaps
@@ -172,6 +186,7 @@ public class LevelManager : MonoBehaviour
         // ClearMap();
 
         factoryHandler.SetLevel(level.grid);
+        factoryHandler.grid.SetForeground(level.foreground);
 
         // // TODO: Make tiles be placed. Need to determine how to do resource dict for tiles to match their entities
         // for (int x = 0; x < level.grid.bounds.size.x; x++)

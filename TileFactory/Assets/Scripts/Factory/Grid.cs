@@ -44,6 +44,18 @@ namespace Factory
                 }
             }
         }
+        
+        // Sets the foreground entities from a list
+        public void SetForeground(List<Entity> foregroundEntities)
+        {
+            foreach (Entity entity in foregroundEntities)
+            {
+                if (CheckPosition(entity.position))
+                {
+                    PlaceEntity(entity, entity.position, 0);
+                }
+            }
+        }
 
         // Returns tiles from the foreground
         public Entity GetTileAtPosition(Vector2Int position)
@@ -184,8 +196,10 @@ namespace Factory
         // Places a tile at a position if the position is empty
         public bool PlaceEntity(Entity entity, Vector2Int position, int layer = 0)
         {
+            // Debug.Log("Position: " + position.ToString() + " placing " + entity.GetType().ToString());
             if (CheckPosition(position))
             {
+                // Debug.Log("Can place!");
                 // The position is empty, store the entity at the position
                 entity.position = position;
                 switch (layer)

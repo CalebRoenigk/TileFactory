@@ -14,5 +14,7 @@ namespace Factory.Data
     {
         public int levelIndex;
         public Grid grid;
+
+        public List<Entity> foreground = new List<Entity>();
     }
 }

@@ -23,5 +23,12 @@ namespace Factory.Objects
             this.isSolid = true;
             this.hasGravity = false;
         }
+        
+        public Terrain(Grid grid, Vector2Int position, int terrainType): base(grid, position)
+        {
+            this.terrainType = terrainType;
+            this.isSolid = true;
+            this.hasGravity = false;
+        }
     }
 }

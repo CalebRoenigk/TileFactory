@@ -13,5 +13,11 @@ namespace Factory.Objects
             this.isSolid = false;
             this.hasGravity = false;
         }
+        
+        public Water(Grid grid, Vector2Int position): base(grid, position)
+        {
+            this.isSolid = false;
+            this.hasGravity = false;
+        }
     }
 }

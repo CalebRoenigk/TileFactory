@@ -6,15 +6,22 @@ using UnityEngine;
 
 namespace Factory.Objects
 {
-    public class Conveyer : Entity
+    public class Conveyor : Entity
     {
-        public Conveyer()
+        public Conveyor()
         {
             this.isSolid = true;
             this.hasGravity = false;
         }
         
-        public Conveyer(Vector2Int movementDirection)
+        public Conveyor(Vector2Int movementDirection)
+        {
+            this.isSolid = true;
+            this.hasGravity = false;
+            this.movementDirection = movementDirection;
+        }
+        
+        public Conveyor(Grid grid, Vector2Int position, Vector2Int movementDirection): base(grid, position)
         {
             this.isSolid = true;
             this.hasGravity = false;
